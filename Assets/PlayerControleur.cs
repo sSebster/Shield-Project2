@@ -47,6 +47,6 @@ public class PlayerControleur : MonoBehaviour
 
     private void StartPosition()
     {
-        direction = new Vector3(1, 0, 1) * distanceToPlayer;
+        direction = new Vector3(1, 0, 1).normalized * distanceToPlayer;
     }
 }
