@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a753baba1b5944148dcdd53f1ecfc0d1, type: 3}
-  m_Name: NewLevel 6
+  m_Name: Level3
   m_EditorClassIdentifier: 
-  levelName: Name random
+  levelName: Level3
   allWavesInLevel: []
   waintingConditionBetweenEachWaves: []

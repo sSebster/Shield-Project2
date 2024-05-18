@@ -1,5 +1,6 @@
 ﻿using System;
 using ScriptableObjects;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -22,11 +23,15 @@ namespace Editor
         {
             LoadAllAssetsOfType<AllLevels>(out AllLevels[] A);
             
+            int count = 0;
+            
             SerializedObject allLevelList = new SerializedObject(A[0]);
             AllLevels thisAllLevels = A[0]; //the AllLevels Scriptable Object
             SerializedObject serializedAllLevels = new SerializedObject(thisAllLevels); //the AllLevels Serialized Object
 
             thisAllLevels.UpdateAllLevelsList();
+            
+            #region levels list
             scrollPosition = GUI.BeginScrollView(new Rect(10, 10, position.width/4, position.height), scrollPosition, new Rect(0, 0, position.width/4, thisAllLevels.allLevelsID.Count*50+150), true, true);
             for (int i = 0; i < thisAllLevels.allLevelsID.Count; i++)
             {
@@ -48,7 +53,7 @@ namespace Editor
                 buttonStyle.alignment = TextAnchor.MiddleCenter;
                 if (GUILayout.Button("Show details", buttonStyle, GUILayout.Width(position.width/4 * 0.7f)))
                 {
-                    //Show details todo
+                    focusOnLevel = thisAllLevels.allLevels[i];
                 }
                 
                 buttonStyle.normal.textColor = Color.red;
@@ -81,6 +86,46 @@ namespace Editor
             GUILayout.EndArea();
             GUI.EndScrollView();
             allLevelList.ApplyModifiedProperties();
+            #endregion
+            
+            #region waves details
+            
+            GUILayout.BeginArea(new Rect(position.width/4+20, 10, position.width/4*3-40, 200));
+            if (focusOnLevel != null)
+            {
+                SerializedObject serializedFocusLevel = new SerializedObject(focusOnLevel);
+                var allWavesInLevelProperty = serializedFocusLevel.FindProperty("allWavesInLevel");
+                LoadAllAssetsOfType<Wave>(out Wave[] allWaves);
+                
+                for (int i = 0; i < allWavesInLevelProperty.arraySize; i++)
+                {
+                    SerializedProperty element = allWavesInLevelProperty.GetArrayElementAtIndex(i);
+                    Wave currentWave = element.objectReferenceValue as Wave;
+
+                    int selectedIndex = -1;
+                    string[] options = new string[allWaves.Length];
+
+                    for (int j = 0; j < allWaves.Length; j++)
+                    {
+                        options[j] = allWaves[j].name;
+
+                        if (allWaves[j] == currentWave)
+                        {
+                            selectedIndex = j;
+                        }
+                    }
+
+                    int newSelectedIndex = EditorGUILayout.Popup($"Wave {i}", selectedIndex, options);
+
+                    if (newSelectedIndex != selectedIndex)
+                    {
+                        element.objectReferenceValue = allWaves[newSelectedIndex];
+                    }
+                }
+                serializedFocusLevel.ApplyModifiedProperties();
+            }
+            GUILayout.EndArea();
+            #endregion
         }
 
             

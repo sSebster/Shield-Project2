@@ -12,6 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2a6deb32abd4caf9dcd48a88d54054e, type: 3}
   m_Name: AllLevels
   m_EditorClassIdentifier: 
-  allLevels: []
-  allLevelsPath: []
-  allLevelsID: []
+  allLevels:
+  - {fileID: 11400000, guid: ef7397d6dcb78dd448f2c10da5db9704, type: 2}
+  - {fileID: 11400000, guid: 9fcbb45cfc4b0364ab82cb7f5740004f, type: 2}
+  - {fileID: 11400000, guid: 852ef84d60a7a1446852c3ecc450e04f, type: 2}
+  allLevelsPath:
+  - Assets/Data/Levels/Level1.asset
+  - Assets/Data/Levels/Level2.asset
+  - Assets/Data/Levels/Level3.asset
+  allLevelsID:
+  - ef7397d6dcb78dd448f2c10da5db9704
+  - 9fcbb45cfc4b0364ab82cb7f5740004f
+  - 852ef84d60a7a1446852c3ecc450e04f

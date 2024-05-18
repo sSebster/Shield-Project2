@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: Level1
   m_EditorClassIdentifier: 
   levelName: Level1
-  allWavesInLevel: []
+  allWavesInLevel:
+  - {fileID: 11400000, guid: 918d9871df9089244918dd19ee0dd2be, type: 2}
+  - {fileID: 11400000, guid: 09146176cf764f945b007e982ed6e870, type: 2}
   waintingConditionBetweenEachWaves: []
