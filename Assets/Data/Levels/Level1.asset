@@ -15,5 +15,25 @@ MonoBehaviour:
   levelName: Level1
   allWavesInLevel:
   - {fileID: 11400000, guid: 918d9871df9089244918dd19ee0dd2be, type: 2}
-  - {fileID: 11400000, guid: 09146176cf764f945b007e982ed6e870, type: 2}
-  waintingConditionBetweenEachWaves: []
+  - {fileID: 11400000, guid: 2c806f94dbdfcb54081559a2e2bc7c41, type: 2}
+  - {fileID: 11400000, guid: 2c806f94dbdfcb54081559a2e2bc7c41, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  waintingConditionBetweenEachWaves:
+  - {fileID: 11400000, guid: 7320b6d79794eab41ade5cecd7889f3b, type: 2}
+  - {fileID: 11400000, guid: 7320b6d79794eab41ade5cecd7889f3b, type: 2}
+  - {fileID: 11400000, guid: 8ea666cf2f04e8d4c94c7f7bc2bc94b3, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}

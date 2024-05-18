@@ -17,19 +17,26 @@ namespace ScriptableObjects
         public void UpdateAllLevelsList()
         {
             string[] levels = UnityEditor.AssetDatabase.FindAssets("t:Level");
-            foreach (var levelID in levels)
+            for (int i = 0; i < levels.Length; i++)
             {
-                if (!allLevelsID.Contains(levelID))
+                if (!allLevelsID.Contains(levels[i]))
                 {
-                    allLevelsID.Add(levelID);
+                    allLevelsID.Add(levels[i]);
                 }
                 
-                var levelPath = UnityEditor.AssetDatabase.GUIDToAssetPath(levelID);
+                var levelPath = UnityEditor.AssetDatabase.GUIDToAssetPath(levels[i]);
                 if (!allLevelsPath.Contains(levelPath))
                 {
                     allLevelsPath.Add(levelPath);
                     allLevels.Add(AssetDatabase.LoadAssetAtPath<Level>(levelPath));
-                    
+                }
+
+                if (allLevels[i].waintingConditionBetweenEachWaves.Count < allLevels[i].allWavesInLevel.Count)
+                {
+                    for (int j = 0; j < allLevels[i].allWavesInLevel.Count - allLevels[i].waintingConditionBetweenEachWaves.Count; j++)
+                    {
+                        allLevels[i].waintingConditionBetweenEachWaves.Add(null);
+                    }
                 }
             }
 
