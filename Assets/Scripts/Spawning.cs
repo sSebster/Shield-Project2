@@ -11,34 +11,52 @@ public class Spawning : MonoBehaviour
     public GameObject Player;
     public GameObject EnnemiePrefabs; //prefab
     private Vector3 Vecennemis;
-    //private float SpawnInterval = 3.0f;// time 
-    public float SpawnRadius = 3.0f;// distance
-    
+    public float MinSpawnRadius = 10.0f; 
+    public float SpawnRadius = 10.0f;// Rayon de la zone de spawn
+    public float cooldown = 1.0f;
+
+    private float timer;
     // Start is called before the first frame update
     void Start()
-    {   
+    {
+        timer = cooldown;
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-        if (Input.GetKeyDown(KeyCode.Space))
+        timer -= Time.deltaTime;
+        if (timer<=0)
         {
-           
+          RecupPoint();
+          timer = cooldown;
         }
-
-        RecupPoint();
+         
+        
     }
 
     void RecupPoint()
     {
-        //Vecennemis =  new Vector3(Player.transform.position.x-Random.Range(-1.0f, 1.0f) ,Player.transform.position.y ,Player.transform.position.z-Random.Range(-1.0f,1.0f));
-        Vecennemis = new Vector3(Random.Range(Player.transform.position.x -1,Player.transform.position.x +1 ), /*Player.transform.position.y*/ 0, Random.Range(Player.transform.position.z-1,Player.transform.position.z +1 ));
-        Instantiate(EnnemiePrefabs, Vecennemis, Quaternion.identity);
-        Debug.Log(Vecennemis);
-        //sort les fichier 
-        //faire la normalize sur le vecteur apres la construction de deux points 
+        // Générer un angle aléatoire en degrés
+        float angle = Random.Range(0f, 360f);
+        
+        // Convertir l'angle en radians
+        float angleRad = angle * Mathf.Deg2Rad;
+        
+        // Générer une distance aléatoire entre MinSpawnDistance et SpawnRadius
+        float distance = Random.Range(MinSpawnRadius, SpawnRadius);
+
+        // Calculer la position de spawn en utilisant des coordonnées 
+        float x = Mathf.Cos(angleRad) * SpawnRadius;
+        float z = Mathf.Sin(angleRad) * SpawnRadius;
+
+        // Utiliser la hauteur du joueur
+        Vector3 spawnPosition = new Vector3(x,0, z) + Player.transform.position;
+
+        // Instancier l'ennemi à la position finale
+        Instantiate(EnnemiePrefabs, spawnPosition, Quaternion.identity);
+       Debug.Log(spawnPosition);
     }
     
 }
