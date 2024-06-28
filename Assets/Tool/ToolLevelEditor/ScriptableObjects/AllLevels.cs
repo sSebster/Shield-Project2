@@ -44,12 +44,27 @@ namespace ScriptableObjects
             {
                 if (!levels.Contains(allLevelsID[i]))
                 {
-                    int indexTemp = i;
                     allLevelsID.Remove(allLevelsID[i]);
                     allLevelsPath.RemoveAt(i);
                     allLevels.RemoveAt(i);
                 }
             }
+            
+            Wave[] allWaves = AssetDatabase.FindAssets("t:Wave").Select(guid => AssetDatabase.LoadAssetAtPath<Wave>(AssetDatabase.GUIDToAssetPath(guid))).ToArray();
+            foreach (var wave in allWaves)
+            {
+                if (wave != null)
+                {
+                    if (wave.allEnnemisInWave != null && wave.waintingBetweenEachEnnemis != null)
+                    {
+                        while (wave.allEnnemisInWave.Count > wave.waintingBetweenEachEnnemis.Count)
+                        {
+                            wave.waintingBetweenEachEnnemis.Add(0);
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using ScriptableObjects;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -20,12 +21,9 @@ namespace Editor
         public Vector2 scrollPosition = Vector2.zero;
         public Vector2 scrollPosition2 = Vector2.zero;
         public Level focusOnLevel;
-        public int numberOfWavesInFocusLevel;
         private void OnGUI()
         {
             LoadAllAssetsOfType<AllLevels>(out AllLevels[] A);
-            
-            int count = 0;
             
             SerializedObject allLevelList = new SerializedObject(A[0]);
             AllLevels thisAllLevels = A[0]; //the AllLevels Scriptable Object
@@ -35,7 +33,7 @@ namespace Editor
             
             #region levels list
 
-            LevelList(thisAllLevels, allLevelList, count);
+            LevelList(thisAllLevels, allLevelList);
             
             #endregion
             
@@ -43,7 +41,9 @@ namespace Editor
             
             if (focusOnLevel != null)
             {
+                int calculatedHeight = (focusOnLevel.allWavesInLevel.Count * 110) + 80;
                 GUILayout.BeginArea(new Rect(position.width/4+50, 10, position.width, focusOnLevel.allWavesInLevel.Count*50+150));
+
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Close details", GUILayout.Height(25),GUILayout.Width(100)))
                 {
@@ -60,22 +60,91 @@ namespace Editor
                 boldLabelStyle.fontStyle = FontStyle.Bold;
                 EditorGUILayout.LabelField("Details waves of " + focusOnLevel.levelName, boldLabelStyle);
                 GUILayout.EndHorizontal();
-                GUILayout.EndArea();
-                scrollPosition2 = GUI.BeginScrollView(new Rect(10, 60, position.width-30, position.height-50), scrollPosition2, new Rect(0, 0, position.width-40, focusOnLevel.allWavesInLevel.Count*50+200), true, true);
                 
-                GUILayout.BeginArea(new Rect(position.width/4+50, 10, position.width/4*3-100, focusOnLevel.allWavesInLevel.Count*50+200));
+                GUILayout.Space(10);
+                EditorGUILayout.LabelField("Summary :", boldLabelStyle);
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(20);
+                EditorGUILayout.LabelField("-Total number of waves : " + focusOnLevel.allWavesInLevel.Count, boldLabelStyle);
+                GUILayout.EndHorizontal();
+                
+                float waitTimeforAllWaves = 0;
+                float timeOfWaves = 0;
+                int numberOfWaitingForThePlayer = 0;
+                for (int i = 0; i < focusOnLevel.waintingConditionBetweenEachWaves.Count-1; i++)
+                {
+                    var conditionList = focusOnLevel.waintingConditionBetweenEachWaves;
+                    if (conditionList[i] != null && conditionList[i].conditionToEnd != ConditionWaveEnd.ConditionToEnd.AllEnnemisDied)
+                    {
+                        waitTimeforAllWaves += focusOnLevel.waintingConditionBetweenEachWaves[i].timeToWait;
+                    }
+                    if (conditionList[i] != null && conditionList[i].conditionToEnd == ConditionWaveEnd.ConditionToEnd.AllEnnemisDied)
+                    {
+                        numberOfWaitingForThePlayer++;
+                    }
+                }
+
+                for (int i = 0; i < focusOnLevel.allWavesInLevel.Count(); i++)
+                {
+                    if (focusOnLevel.allWavesInLevel[i] != null)
+                    {
+                        for (int j = 0; j < focusOnLevel.allWavesInLevel[i].allEnnemisInWave.Count-1; j++)
+                        {
+                            if (j < focusOnLevel.allWavesInLevel[i].waintingBetweenEachEnnemis.Count())
+                            {
+                                timeOfWaves += focusOnLevel.allWavesInLevel[i].waintingBetweenEachEnnemis[j];
+                            }
+                        }
+                    }
+                }
+
+                waitTimeforAllWaves += timeOfWaves;
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(20);
+                EditorGUILayout.LabelField("-Time total of waves : " + waitTimeforAllWaves + " seconds", boldLabelStyle);
+                GUILayout.EndHorizontal();
+                
+                
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(20);
+                EditorGUILayout.LabelField("-We wait " + numberOfWaitingForThePlayer + " times for the player to kill every ennemis", boldLabelStyle);
+                GUILayout.EndHorizontal();
+                
+                int totalNumberOfEnnemis = 0;
+
+                for (int i = 0; i < focusOnLevel.allWavesInLevel.Count; i++)
+                {
+                    if (focusOnLevel.allWavesInLevel[i] != null)
+                    {
+                        totalNumberOfEnnemis += focusOnLevel.allWavesInLevel[i].allEnnemisInWave.Count;
+                    }
+                }
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(20);
+                EditorGUILayout.LabelField("-Total numbers of ennemis : " + totalNumberOfEnnemis, boldLabelStyle);
+                GUILayout.EndHorizontal();
+                GUILayout.EndArea();
+                
+                GUILayout.Space(30);
+                scrollPosition2 = GUI.BeginScrollView(new Rect(10, 170, position.width - 30, position.height - 160), scrollPosition2, new Rect(0, 0, position.width - 40, calculatedHeight), false, true);
+
+                
+                GUILayout.BeginArea(new Rect(position.width / 4 + 50, 10, position.width / 4 * 3 - 100, calculatedHeight));
                 
                 SerializedObject serializedFocusLevel = new SerializedObject(focusOnLevel);
                 var allWavesInLevelProperty = serializedFocusLevel.FindProperty("allWavesInLevel");
+                var waintingConditionBetweenEachWavesProperty = serializedFocusLevel.FindProperty("waintingConditionBetweenEachWaves");
                 LoadAllAssetsOfType<Wave>(out Wave[] allWaves);
+                LoadAllAssetsOfType<ConditionWaveEnd>(out ConditionWaveEnd[] allConditions);
+
                 
                 for (int i = 0; i < allWavesInLevelProperty.arraySize; i++)
                 {
                     GUILayout.BeginHorizontal();
                     SerializedProperty element = allWavesInLevelProperty.GetArrayElementAtIndex(i);
-                    numberOfWavesInFocusLevel = allWavesInLevelProperty.arraySize;
+                    SerializedProperty element2 = waintingConditionBetweenEachWavesProperty.GetArrayElementAtIndex(i);
                     Wave currentWave = element.objectReferenceValue as Wave;
-
+                    //Start of First Popup//
                     int selectedIndex = -1;
                     string[] options = new string[allWaves.Length];
 
@@ -88,15 +157,13 @@ namespace Editor
                             selectedIndex = j;
                         }
                     }
-                    EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField($"Wave N°{i+1}", GUILayout.Width(EditorGUIUtility.labelWidth - 70));
-                    int newSelectedIndex = EditorGUILayout.Popup(selectedIndex, options, GUILayout.ExpandWidth(true));
-                    EditorGUILayout.EndHorizontal();   
+                    selectedIndex = EditorGUILayout.Popup($"Wave {i+1}", selectedIndex, options);
                     
-                    if (newSelectedIndex != selectedIndex)
+                    if (selectedIndex >= 0)
                     {
-                        element.objectReferenceValue = allWaves[newSelectedIndex];
+                        element.objectReferenceValue = allWaves[selectedIndex];
                     }
+                    //End of First Popup//
                     
                     GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
                     buttonStyle.alignment = TextAnchor.MiddleCenter;
@@ -116,6 +183,56 @@ namespace Editor
                         }
                     }
                     GUILayout.EndHorizontal();
+                    
+                    if (i != allWavesInLevelProperty.arraySize - 1)
+                    {
+                        //Start of Second Popup//
+                        if (selectedIndex >= 0)
+                        {
+                            element.objectReferenceValue = allWaves[selectedIndex];
+                        }
+                    
+                        ConditionWaveEnd currentCondition = element2.objectReferenceValue as ConditionWaveEnd;
+                        int selectedConditionIndex = -1;
+                        string[] conditionOptions = new string[allConditions.Length];
+
+                        for (int j = 0; j < allConditions.Length; j++)
+                        {
+                            conditionOptions[j] = allConditions[j].name;
+
+                            if (allConditions[j] == currentCondition)
+                            {
+                                selectedConditionIndex = j;
+                            }
+                        }
+                        GUILayout.Space(3);
+                        selectedConditionIndex = EditorGUILayout.Popup($"-Condition to end", selectedConditionIndex, conditionOptions, GUILayout.Width(position.width/2));
+                        if (selectedConditionIndex >= 0)
+                        {
+                            element2.objectReferenceValue = allConditions[selectedConditionIndex];
+                        }
+                        //End of Second Popup//
+                    }
+                    if (focusOnLevel.allWavesInLevel[i] != null)
+                    { 
+                        EditorGUILayout.LabelField("-Number of ennemies : " + focusOnLevel.allWavesInLevel[i].allEnnemisInWave.Count()); 
+                    }
+                    else
+                    {
+                        EditorGUILayout.LabelField("-Number of ennemies : N/A" );
+                    }
+                    
+                    float timeOfTheWave = 0;
+                    if (focusOnLevel.allWavesInLevel[i] != null)
+                    {
+                        for (int j = 0; j < focusOnLevel.allWavesInLevel[i].allEnnemisInWave.Count()-1; j++)
+                        { 
+                            timeOfTheWave += focusOnLevel.allWavesInLevel[i].waintingBetweenEachEnnemis[j];
+                        }
+                    }
+                    
+                    EditorGUILayout.LabelField("-Time of the wave : " + timeOfTheWave + " seconds");
+                    //Todo Button Edit wave
                     GUILayout.Space(25);
                 }
                 if (GUILayout.Button("Add new wave ?", GUILayout.Height(40)))
@@ -155,9 +272,15 @@ namespace Editor
             AssetDatabase.Refresh();
         }
 
-        private void LevelList(AllLevels thisAllLevels, SerializedObject allLevelList, int count)
+        private void LevelList(AllLevels thisAllLevels, SerializedObject allLevelList)
         {
-            scrollPosition = GUI.BeginScrollView(new Rect(10, 10, position.width/4+30, position.height), scrollPosition, new Rect(0, 0, position.width/4+30, (thisAllLevels.allLevelsID.Count+1)*65+100), true, true);
+            GUILayout.Space(10);
+            GUIStyle boldLabelStyle = new GUIStyle(EditorStyles.label);
+            boldLabelStyle.fontStyle = FontStyle.Bold;
+            EditorGUILayout.LabelField("All Levels :", boldLabelStyle);
+            
+            scrollPosition = GUI.BeginScrollView(new Rect(10, 30, position.width/4+30, position.height-20), scrollPosition, new Rect(0, 0, position.width/4+30, (thisAllLevels.allLevelsID.Count+1)*65+100), true, true);
+            
             for (int i = 0; i < thisAllLevels.allLevelsID.Count; i++)
             {
                 GUILayout.BeginArea(new Rect(10, 10 + (i * 65), position.width / 4, position.height));
@@ -178,7 +301,6 @@ namespace Editor
                 if (GUILayout.Button("Show details", buttonStyle, GUILayout.Width(position.width/4 * 0.7f)))
                 {
                     focusOnLevel = thisAllLevels.allLevels[i];
-                    count = 0;
                 }
                 
                 buttonStyle.normal.textColor = Color.red;

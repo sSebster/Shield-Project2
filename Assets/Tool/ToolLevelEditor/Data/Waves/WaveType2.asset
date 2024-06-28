@@ -17,9 +17,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: afb61147072a5a34c945fc42c38b150e, type: 2}
   - {fileID: 11400000, guid: afb61147072a5a34c945fc42c38b150e, type: 2}
   - {fileID: 11400000, guid: afb61147072a5a34c945fc42c38b150e, type: 2}
-  - {fileID: 11400000, guid: afb61147072a5a34c945fc42c38b150e, type: 2}
   waintingBetweenEachEnnemis:
-  - 2
   - 2
   - 2
   - 2
